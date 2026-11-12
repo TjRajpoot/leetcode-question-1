@@ -1,0 +1,25 @@
+name: Validate reference solutions
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  python-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run differential tests
+        run: python3 tools/test_generator.py --rounds 5000
+
+  compile-reference-solutions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile C++17 reference
+        run: g++ -std=c++17 -O2 -c solutions/solution.cpp -o /tmp/solution.o
+      - name: Compile Java reference
+        run: javac -d /tmp/java-out solutions/Solution.java
